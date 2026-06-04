@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+.git/
+.vs/
+.idea/
+.vscode/
+.tmp/
+docs/
+tests/
+**/__pycache__/
+**/.pytest_cache/

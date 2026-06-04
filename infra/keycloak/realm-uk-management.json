@@ -1,0 +1,126 @@
+{
+  "realm": "uk-management",
+  "enabled": true,
+  "displayName": "SmartUK",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "ru"
+  ],
+  "defaultLocale": "ru",
+  "roles": {
+    "realm": [
+      { "name": "Admin" },
+      { "name": "Dispatcher" },
+      { "name": "Resident" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "uk-web",
+      "name": "SmartUK Web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5000/signin-oidc",
+        "http://localhost:5000/signout-callback-oidc"
+      ],
+      "webOrigins": [
+        "http://localhost:5000"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5000/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "user.attribute": "foo",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "role",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "dispatcher",
+      "enabled": true,
+      "email": "dispatcher@uk.local",
+      "firstName": "Диспетчер",
+      "lastName": "УК",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dispatcher",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "Dispatcher"
+      ]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@uk.local",
+      "firstName": "Администратор",
+      "lastName": "УК",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "Admin"
+      ]
+    },
+    {
+      "username": "resident101",
+      "enabled": true,
+      "email": "ivanov101@example.local",
+      "firstName": "Сергей",
+      "lastName": "Иванов",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "resident101",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "Resident"
+      ]
+    },
+    {
+      "username": "resident42",
+      "enabled": true,
+      "email": "smirnova42@example.local",
+      "firstName": "Анна",
+      "lastName": "Смирнова",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "resident42",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "Resident"
+      ]
+    }
+  ]
+}

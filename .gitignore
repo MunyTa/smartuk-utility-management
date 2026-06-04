@@ -1,0 +1,19 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.db
+*.log
+__pycache__/
+.pytest_cache/
+pytest-cache-files-*/
+.venv/
+.env
+.tmp/
+.nuget/
+coverage/
+TestResults/
+МЕТОДИЧЕСКИЕ УКАЗАНИЯ К КУРСОВОЙ РАБОТЕ _ 2026 .pdf

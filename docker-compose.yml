@@ -1,0 +1,108 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: uk_management
+      POSTGRES_USER: uk_user
+      POSTGRES_PASSWORD: uk_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uk_user -d uk_management"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: "8080"
+      KC_HOSTNAME_STRICT: "false"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infra/keycloak/realm-uk-management.json:/opt/keycloak/data/import/realm-uk-management.json:ro
+
+  web:
+    build:
+      context: .
+      dockerfile: src/UkManagement.Web/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=uk_management;Username=uk_user;Password=uk_password
+      Authentication__Enabled: "true"
+      Authentication__Authority: http://keycloak:8080/realms/uk-management
+      Authentication__PublicAuthority: http://localhost:8080/realms/uk-management
+      Authentication__MetadataAddress: http://keycloak:8080/realms/uk-management/.well-known/openid-configuration
+      Authentication__ClientId: uk-web
+      Mqtt__Enabled: "true"
+      Mqtt__Host: mosquitto
+      Mqtt__Port: "1883"
+      Mqtt__Topic: uk/meters/readings
+      Smtp__Host: "${SMTP_HOST:-smtp.mail.ru}"
+      Smtp__Port: "${SMTP_PORT:-2525}"
+      Smtp__UseSsl: "${SMTP_USE_SSL:-false}"
+      Smtp__UserName: "${SMTP_USERNAME:-}"
+      Smtp__Password: "${SMTP_PASSWORD:-}"
+      Smtp__FromEmail: "${SMTP_FROM_EMAIL:-dispatcher@uk.local}"
+      Smtp__FromName: "${SMTP_FROM_NAME:-Диспетчер УК}"
+      Sms__Login: "${SMS_LOGIN:-}"
+      Sms__ApiKey: "${SMS_API_KEY:-}"
+      Sms__Sender: "${SMS_SENDER:-}"
+      Sms__TestMode: "${SMS_TEST_MODE:-false}"
+      Vapid__PublicKey: "${VAPID_PUBLIC_KEY:-}"
+      Vapid__PrivateKey: "${VAPID_PRIVATE_KEY:-}"
+      Vapid__Subject: "${VAPID_SUBJECT:-mailto:dispatcher@uk.local}"
+      KeycloakAdmin__BaseUrl: http://keycloak:8080
+      KeycloakAdmin__Realm: uk-management
+      KeycloakAdmin__AdminRealm: master
+      KeycloakAdmin__ClientId: admin-cli
+      KeycloakAdmin__UserName: admin
+      KeycloakAdmin__Password: admin
+    ports:
+      - "5000:8080"
+    volumes:
+      - web-data-protection:/root/.aspnet/DataProtection-Keys
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+      keycloak:
+        condition: service_started
+
+  iot-simulator:
+    build:
+      context: ./src/iot-simulator
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      MQTT_TOPIC: uk/meters/readings
+      PUBLISH_INTERVAL_SECONDS: "5"
+      METER_CATALOG_URL: http://web:8080/api/simulator/meters
+      METER_CATALOG_REFRESH_SECONDS: "10"
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      mosquitto:
+        condition: service_started
+      web:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  web-data-protection:
