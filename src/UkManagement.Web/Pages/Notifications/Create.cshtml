@@ -1,0 +1,93 @@
+@page
+@model UkManagement.Web.Pages.Notifications.CreateModel
+@{
+    ViewData["Title"] = "Новое уведомление";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Доставка сообщений</p>
+        <h1>Новое уведомление</h1>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post" class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="Form.TargetMode" class="form-label">Получатели</label>
+            <select asp-for="Form.TargetMode" class="form-select" id="recipient-mode">
+                <option value="Apartment">Одна квартира</option>
+                <option value="All">Все жильцы</option>
+            </select>
+            <span asp-validation-for="Form.TargetMode" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-8" id="apartment-target">
+            <label asp-for="Form.ApartmentId" class="form-label">Квартира</label>
+            <select asp-for="Form.ApartmentId" asp-items="Model.Apartments" class="form-select"></select>
+            <span asp-validation-for="Form.ApartmentId" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            <label for="notification-template" class="form-label">Шаблон</label>
+            <select id="notification-template" class="form-select">
+                <option value="">Без шаблона</option>
+                @foreach (var template in Model.Templates)
+                {
+                    <option value="@template.Name"
+                            data-subject="@template.Subject"
+                            data-body="@template.Body">
+                        @template.Name
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Form.Channel" class="form-label">Канал</label>
+            <select asp-for="Form.Channel" class="form-select" asp-items="Model.ChannelOptions"></select>
+            <span asp-validation-for="Form.Channel" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-8">
+            <label asp-for="Form.Subject" class="form-label">Тема</label>
+            <input asp-for="Form.Subject" class="form-control" />
+            <span asp-validation-for="Form.Subject" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            <label asp-for="Form.Body" class="form-label">Сообщение</label>
+            <textarea asp-for="Form.Body" class="form-control" rows="6"></textarea>
+            <span asp-validation-for="Form.Body" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Отправить</button>
+            <a class="btn btn-outline-secondary" asp-page="/Notifications/Index">Отмена</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('notification-template')?.addEventListener('change', (event) => {
+            const option = event.target.selectedOptions[0];
+            if (!option?.dataset.subject) {
+                return;
+            }
+
+            document.getElementById('Form_Subject').value = option.dataset.subject;
+            document.getElementById('Form_Body').value = option.dataset.body;
+        });
+
+        const recipientMode = document.getElementById('recipient-mode');
+        const apartmentTarget = document.getElementById('apartment-target');
+        const syncRecipientMode = () => {
+            apartmentTarget.classList.toggle('d-none', recipientMode.value === 'All');
+        };
+
+        recipientMode?.addEventListener('change', syncRecipientMode);
+        syncRecipientMode();
+    </script>
+}
