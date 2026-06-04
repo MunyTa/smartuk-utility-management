@@ -1,0 +1,39 @@
+@page
+@model UkManagement.Web.Pages.Register.ConfirmModel
+@{
+    ViewData["Title"] = "Подтверждение email";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Проверка почты</p>
+        <h1>Подтверждение email</h1>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post" class="row g-3">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="All" class="alert alert-danger validation-summary"></div>
+
+        <div class="col-12">
+            <label class="form-label">Email</label>
+            <input class="form-control" value="@Model.RegistrationRequest.Email" disabled />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Form.Code" class="form-label">Код из письма</label>
+            <input asp-for="Form.Code" class="form-control" maxlength="5" />
+            <span asp-validation-for="Form.Code" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Подтвердить</button>
+            <a class="btn btn-outline-secondary" asp-page="/Index">На главную</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

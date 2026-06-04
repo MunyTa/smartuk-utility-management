@@ -1,0 +1,77 @@
+@page
+@model UkManagement.Web.Pages.Meters.IndexModel
+@{
+    ViewData["Title"] = "Приборы учета";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Телеметрия</p>
+        <h1>Приборы учета</h1>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        @if (User.IsInRole("Admin"))
+        {
+            <a class="btn btn-primary" asp-page="/Meters/Create" asp-route-apartmentId="@Model.ApartmentId">Добавить прибор</a>
+        }
+    </div>
+</section>
+
+<section class="panel mb-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <label asp-for="ApartmentId" class="form-label">Квартира</label>
+            <select asp-for="ApartmentId" asp-items="Model.ApartmentOptions" class="form-select">
+                <option value="">Все квартиры</option>
+            </select>
+        </div>
+        <div class="col-md-auto d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Показать</button>
+            <a class="btn btn-outline-secondary" asp-page="/Meters/Index">Сброс</a>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Серийный номер</th>
+                <th>Тип</th>
+                <th>Адрес</th>
+                <th>ID устройства</th>
+                <th>Последнее значение</th>
+                <th>Статус</th>
+                @if (User.IsInRole("Admin"))
+                {
+                    <th></th>
+                }
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var meter in Model.Meters)
+            {
+                <tr>
+                    <td>@meter.SerialNumber</td>
+                    <td>@meter.Type.ToDisplayName()</td>
+                    <td>@meter.Apartment.Building.Address, кв. @meter.Apartment.Number</td>
+                    <td><code>@meter.ExternalDeviceId</code></td>
+                    <td>@(meter.LastValue is null ? "-" : $"{meter.LastValue} {meter.Unit}")</td>
+                    <td><span class="status status-@meter.Status.ToString().ToLowerInvariant()">@meter.Status.ToDisplayName()</span></td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <td class="text-end">
+                            <a class="btn btn-outline-secondary btn-sm" asp-page="/Meters/Replace" asp-route-id="@meter.Id">Заменить</a>
+                        </td>
+                    }
+                </tr>
+            }
+            @if (!Model.Meters.Any())
+            {
+                <tr><td colspan="7" class="text-muted">Приборы не найдены.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

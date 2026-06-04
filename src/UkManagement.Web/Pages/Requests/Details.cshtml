@@ -1,0 +1,198 @@
+@page "{id:int}"
+@model UkManagement.Web.Pages.Requests.DetailsModel
+@{
+    ViewData["Title"] = $"Заявка #{Model.ServiceRequestItem.Id}";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">@(User.IsInRole("Admin") ? "Приборы учета" : "Диспетчеризация")</p>
+        <h1>Заявка #@Model.ServiceRequestItem.Id</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Requests/Index">К списку</a>
+</section>
+
+<div class="content-grid">
+    <section class="panel">
+        <div class="panel-header">
+            <h2>@Model.ServiceRequestItem.Title</h2>
+            <span class="status status-request-@Model.ServiceRequestItem.Status.ToString().ToLowerInvariant()">
+                @Model.ServiceRequestItem.Status.ToDisplayName()
+            </span>
+        </div>
+
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Житель</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.Resident.FullName</dd>
+
+            <dt class="col-sm-4">Адрес</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.Resident.Apartment.Building.Address, кв. @Model.ServiceRequestItem.Resident.Apartment.Number</dd>
+
+            <dt class="col-sm-4">Телефон</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.Resident.Phone</dd>
+
+            <dt class="col-sm-4">Категория</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.Category.ToDisplayName()</dd>
+
+            <dt class="col-sm-4">Приоритет</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.Priority.ToDisplayName()</dd>
+
+            <dt class="col-sm-4">Создана</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.CreatedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</dd>
+
+            <dt class="col-sm-4">Обновлена</dt>
+            <dd class="col-sm-8">@(Model.ServiceRequestItem.UpdatedAt is null ? "-" : Model.ServiceRequestItem.UpdatedAt.Value.ToDisplayTime().ToString("dd.MM.yyyy HH:mm"))</dd>
+
+            <dt class="col-sm-4">Закрыта</dt>
+            <dd class="col-sm-8">@(Model.ServiceRequestItem.ClosedAt is null ? "-" : Model.ServiceRequestItem.ClosedAt.Value.ToDisplayTime().ToString("dd.MM.yyyy HH:mm"))</dd>
+
+            <dt class="col-sm-4">Описание</dt>
+            <dd class="col-sm-8">@Model.ServiceRequestItem.Description</dd>
+
+            <dt class="col-sm-4">Комментарий диспетчера</dt>
+            <dd class="col-sm-8">@(Model.ServiceRequestItem.DispatcherComment ?? "-")</dd>
+        </dl>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Обработка</h2>
+        </div>
+
+        <form method="post" class="row g-3">
+            <div class="col-12">
+                <label asp-for="Form.Status" class="form-label">Статус</label>
+                <select asp-for="Form.Status" asp-items="Model.StatusOptions" class="form-select"></select>
+                <span asp-validation-for="Form.Status" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Form.Priority" class="form-label">Приоритет</label>
+                <select asp-for="Form.Priority" asp-items="Model.PriorityOptions" class="form-select"></select>
+                <span asp-validation-for="Form.Priority" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Form.DispatcherComment" class="form-label">Комментарий</label>
+                <textarea asp-for="Form.DispatcherComment" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Form.DispatcherComment" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">Сохранить</button>
+            </div>
+        </form>
+    </section>
+
+    @if (User.IsInRole("Admin")
+        && Model.ServiceRequestItem.Category == ServiceRequestCategory.MeterInstallation
+        && Model.ServiceRequestItem.Status is not ServiceRequestStatus.Completed
+        && Model.ServiceRequestItem.Status is not ServiceRequestStatus.Cancelled)
+    {
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Добавить прибор</h2>
+            </div>
+
+            <form method="post" asp-page-handler="CreateMeter" asp-route-id="@Model.ServiceRequestItem.Id" class="row g-3">
+                <div asp-validation-summary="All" class="alert alert-danger validation-summary"></div>
+
+                <div class="col-md-6">
+                    <label asp-for="MeterForm.Type" class="form-label">Тип прибора</label>
+                    <select asp-for="MeterForm.Type" asp-items="Model.MeterTypeOptions" class="form-select"></select>
+                    <span asp-validation-for="MeterForm.Type" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="MeterForm.SerialNumber" class="form-label">Серийный номер</label>
+                    <input asp-for="MeterForm.SerialNumber" class="form-control" />
+                    <span asp-validation-for="MeterForm.SerialNumber" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="MeterForm.ExternalDeviceId" class="form-label">ID устройства MQTT</label>
+                    <input asp-for="MeterForm.ExternalDeviceId" class="form-control" />
+                    <span asp-validation-for="MeterForm.ExternalDeviceId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="MeterForm.InitialValue" class="form-label">Начальное показание</label>
+                    <input asp-for="MeterForm.InitialValue" class="form-control" />
+                    <span asp-validation-for="MeterForm.InitialValue" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="MeterForm.Comment" class="form-label">Комментарий</label>
+                    <textarea asp-for="MeterForm.Comment" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="MeterForm.Comment" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Добавить прибор и закрыть заявку</button>
+                </div>
+            </form>
+        </section>
+    }
+
+    @if (User.IsInRole("Admin")
+        && Model.ServiceRequestItem.Category == ServiceRequestCategory.MeterReplacement
+        && Model.ServiceRequestItem.Status is not ServiceRequestStatus.Completed
+        && Model.ServiceRequestItem.Status is not ServiceRequestStatus.Cancelled)
+    {
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Заменить прибор</h2>
+            </div>
+
+            <form method="post" asp-page-handler="ReplaceMeter" asp-route-id="@Model.ServiceRequestItem.Id" class="row g-3">
+                <div asp-validation-summary="All" class="alert alert-danger validation-summary"></div>
+
+                <div class="col-12">
+                    <label asp-for="ReplacementForm.MeterId" class="form-label">Прибор</label>
+                    <select asp-for="ReplacementForm.MeterId" asp-items="Model.MeterOptions" class="form-select">
+                        <option value="">Выберите прибор</option>
+                    </select>
+                    <span asp-validation-for="ReplacementForm.MeterId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ReplacementForm.SerialNumber" class="form-label">Новый серийный номер</label>
+                    <input asp-for="ReplacementForm.SerialNumber" class="form-control" />
+                    <span asp-validation-for="ReplacementForm.SerialNumber" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ReplacementForm.ExternalDeviceId" class="form-label">Новый ID устройства MQTT</label>
+                    <input asp-for="ReplacementForm.ExternalDeviceId" class="form-control" />
+                    <span asp-validation-for="ReplacementForm.ExternalDeviceId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ReplacementForm.Unit" class="form-label">Единица измерения</label>
+                    <input asp-for="ReplacementForm.Unit" class="form-control" placeholder="оставить прежнюю" />
+                    <span asp-validation-for="ReplacementForm.Unit" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ReplacementForm.InitialValue" class="form-label">Начальное показание</label>
+                    <input asp-for="ReplacementForm.InitialValue" class="form-control" />
+                    <span asp-validation-for="ReplacementForm.InitialValue" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="ReplacementForm.Comment" class="form-label">Комментарий</label>
+                    <textarea asp-for="ReplacementForm.Comment" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="ReplacementForm.Comment" class="text-danger"></span>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Заменить прибор и закрыть заявку</button>
+                </div>
+            </form>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,72 @@
+@page
+@model UkManagement.Web.Pages.Admin.Registrations.IndexModel
+@{
+    ViewData["Title"] = "Заявки на регистрацию";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Допуск жильцов</p>
+        <h1>Заявки на регистрацию</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Admin/Index">Администрирование</a>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Создана</th>
+                <th>Житель</th>
+                <th>Квартира</th>
+                <th>Контакты</th>
+                <th>Статус</th>
+                <th>Комментарий</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var request in Model.Requests)
+            {
+                <tr>
+                    <td>@request.CreatedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@request.FullName</td>
+                    <td>@request.ApartmentNumber</td>
+                    <td>
+                        <div>@request.Email</div>
+                        <div class="text-muted small">@request.Phone</div>
+                    </td>
+                    <td>@request.Status.ToDisplayName()</td>
+                    <td>@(request.ReviewComment ?? "-")</td>
+                    <td class="text-end">
+                        @if (request.Status == RegistrationRequestStatus.PendingApproval)
+                        {
+                            <form method="post" class="d-inline" asp-page-handler="Approve" asp-route-id="@request.Id">
+                                <button class="btn btn-primary btn-sm" type="submit">Подтвердить</button>
+                            </form>
+                            <form method="post" class="d-inline-flex gap-2 mt-2" asp-page-handler="Reject" asp-route-id="@request.Id">
+                                <input class="form-control form-control-sm" name="reviewComment" placeholder="Причина отказа" />
+                                <button class="btn btn-outline-danger btn-sm" type="submit">Отклонить</button>
+                            </form>
+                        }
+                        else if (request.Status == RegistrationRequestStatus.EmailCodeSent)
+                        {
+                            <span class="text-muted small">Ждет код email</span>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Requests.Any())
+            {
+                <tr><td colspan="7" class="text-muted">Заявок на регистрацию пока нет.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

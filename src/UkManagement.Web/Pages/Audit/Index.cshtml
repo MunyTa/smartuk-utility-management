@@ -1,0 +1,77 @@
+@page
+@model UkManagement.Web.Pages.Audit.IndexModel
+@{
+    ViewData["Title"] = "Журнал действий";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Контроль изменений</p>
+        <h1>Журнал действий</h1>
+    </div>
+</section>
+
+<section class="panel mb-3">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label asp-for="Actor" class="form-label">Пользователь</label>
+            <input asp-for="Actor" class="form-control" placeholder="admin, dispatcher, resident101" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="ActionType" class="form-label">Действие</label>
+            <select asp-for="ActionType" class="form-select">
+                <option value="">Все действия</option>
+                <option value="RequestCreated">Создание заявки</option>
+                <option value="RequestUpdated">Изменение заявки</option>
+                <option value="MeterCreated">Добавление прибора</option>
+                <option value="MeterCreatedFromRequest">Добавление прибора по заявке</option>
+                <option value="MeterReplaced">Замена прибора</option>
+                <option value="NotificationSent">Отправка уведомления</option>
+                <option value="NotificationsSent">Массовая отправка уведомлений</option>
+                <option value="ReadingsRetentionUpdated">Настройка хранения</option>
+                <option value="ReadingSubmitted">Передача показаний</option>
+                <option value="ResidentProfileUpdated">Изменение контактов жильца</option>
+                <option value="RegistrationApproved">Подтверждение регистрации</option>
+                <option value="RegistrationRejected">Отклонение регистрации</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Применить</button>
+            <a class="btn btn-outline-secondary" asp-page="/Audit/Index">Сброс</a>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Время</th>
+                <th>Пользователь</th>
+                <th>Роль</th>
+                <th>Действие</th>
+                <th>Объект</th>
+                <th>Описание</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var entry in Model.Entries)
+            {
+                <tr>
+                    <td>@entry.CreatedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm:ss")</td>
+                    <td><code>@entry.ActorUserName</code></td>
+                    <td>@entry.ActorRole</td>
+                    <td>@entry.ActionType</td>
+                    <td>@entry.EntityName @(entry.EntityId is null ? string.Empty : $"#{entry.EntityId}")</td>
+                    <td>@entry.Details</td>
+                </tr>
+            }
+            @if (!Model.Entries.Any())
+            {
+                <tr><td colspan="6" class="text-muted">Записей журнала пока нет.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

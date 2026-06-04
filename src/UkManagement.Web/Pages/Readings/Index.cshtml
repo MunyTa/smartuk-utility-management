@@ -1,0 +1,88 @@
+@page
+@model UkManagement.Web.Pages.Readings.IndexModel
+@{
+    ViewData["Title"] = "Журнал показаний";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">MQTT / LoRaWAN · хранение @Model.RetentionDays дн.</p>
+        <h1>Журнал показаний</h1>
+    </div>
+    <a class="btn btn-outline-primary" asp-page="/Readings/Settings">Настройки хранения</a>
+</section>
+
+<section class="panel mb-3">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label asp-for="ApartmentNumber" class="form-label">Квартира</label>
+            <select asp-for="ApartmentNumber" asp-items="Model.ApartmentOptions" class="form-select">
+                <option value="">Все квартиры</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="Floor" class="form-label">Этаж</label>
+            <select asp-for="Floor" asp-items="Model.FloorOptions" class="form-select">
+                <option value="">Все этажи</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="MeterType" class="form-label">Тип прибора</label>
+            <select asp-for="MeterType" asp-items="Model.MeterTypeOptions" class="form-select">
+                <option value="">Все типы</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="Sort" class="form-label">Сортировка</label>
+            <select asp-for="Sort" asp-items="Model.SortOptions" class="form-select"></select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-primary flex-fill" type="submit">Применить</button>
+            <a class="btn btn-outline-secondary" asp-page="/Readings/Index">Сброс</a>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Получено</th>
+                <th>Измерено</th>
+                <th>Прибор</th>
+                <th>Квартира</th>
+                <th>Этаж</th>
+                <th>Значение</th>
+                <th>RSSI</th>
+                <th>Батарея</th>
+                <th>Качество</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var reading in Model.Readings)
+            {
+                <tr>
+                    <td>@reading.ReceivedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm:ss")</td>
+                    <td>@reading.MeasuredAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm:ss")</td>
+                    <td>@reading.Meter.SerialNumber</td>
+                    <td>@reading.Meter.Apartment.Number</td>
+                    <td>@reading.Meter.Apartment.Floor</td>
+                    <td>@reading.Value @reading.Meter.Unit</td>
+                    <td>@(reading.SignalRssi?.ToString() ?? "-")</td>
+                    <td>@(reading.BatteryVoltage is null ? "-" : $"{reading.BatteryVoltage} V")</td>
+                    <td><span class="status status-@reading.Quality.ToString().ToLowerInvariant()">@reading.Quality.ToDisplayName()</span></td>
+                </tr>
+            }
+            @if (!Model.Readings.Any())
+            {
+                <tr><td colspan="9" class="text-muted">Показания по выбранным параметрам не найдены.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

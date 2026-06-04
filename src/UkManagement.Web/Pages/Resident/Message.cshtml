@@ -1,0 +1,35 @@
+@page "{id:long}"
+@model UkManagement.Web.Pages.ResidentArea.MessageModel
+@{
+    ViewData["Title"] = Model.Message.Subject;
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Сообщения от УК</p>
+        <h1>@Model.Message.Subject</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Resident/Messages">К списку сообщений</a>
+</section>
+
+<section class="panel">
+    <dl class="row mb-3">
+        <dt class="col-sm-3">Получено</dt>
+        <dd class="col-sm-9">@Model.Message.CreatedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">Канал</dt>
+        <dd class="col-sm-9">@Model.Message.Channel.ToDisplayName()</dd>
+
+        <dt class="col-sm-3">Статус</dt>
+        <dd class="col-sm-9">
+            <span class="status status-@Model.Message.Status.ToString().ToLowerInvariant()">
+                @Model.Message.Status.ToDisplayName()
+            </span>
+        </dd>
+
+        <dt class="col-sm-3">Прочитано</dt>
+        <dd class="col-sm-9">@(Model.Message.ReadAt?.ToDisplayTime().ToString("dd.MM.yyyy HH:mm") ?? "-")</dd>
+    </dl>
+
+    <div class="message-body">@Model.Message.Body</div>
+</section>

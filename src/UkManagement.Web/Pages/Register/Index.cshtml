@@ -1,0 +1,64 @@
+@page
+@model UkManagement.Web.Pages.Register.IndexModel
+@{
+    ViewData["Title"] = "Регистрация жильца";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Новый житель</p>
+        <h1>Регистрация жильца</h1>
+    </div>
+    <a class="btn btn-outline-secondary" href="/login">Войти</a>
+</section>
+
+<section class="panel">
+    <form method="post" class="row g-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-md-8">
+            <label asp-for="Form.FullName" class="form-label">ФИО</label>
+            <input asp-for="Form.FullName" class="form-control" />
+            <span asp-validation-for="Form.FullName" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Form.ApartmentNumber" class="form-label">Квартира</label>
+            <input asp-for="Form.ApartmentNumber" class="form-control" />
+            <span asp-validation-for="Form.ApartmentNumber" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.Email" class="form-label">Email</label>
+            <input asp-for="Form.Email" class="form-control" />
+            <span asp-validation-for="Form.Email" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.Phone" class="form-label">Телефон</label>
+            <input asp-for="Form.Phone" class="form-control" />
+            <span asp-validation-for="Form.Phone" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.Password" class="form-label">Пароль</label>
+            <input asp-for="Form.Password" type="password" class="form-control" />
+            <span asp-validation-for="Form.Password" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.ConfirmPassword" class="form-label">Повтор пароля</label>
+            <input asp-for="Form.ConfirmPassword" type="password" class="form-control" />
+            <span asp-validation-for="Form.ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Получить код</button>
+            <a class="btn btn-outline-secondary" asp-page="/Index">Отмена</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

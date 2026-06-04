@@ -1,0 +1,50 @@
+@page
+@model UkManagement.Web.Pages.Requests.IndexModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">@(User.IsInRole("Admin") ? "Приборы учета" : "Диспетчеризация")</p>
+        <h1>@Model.PageTitle</h1>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Создана</th>
+                <th>Житель</th>
+                <th>Категория</th>
+                <th>Приоритет</th>
+                <th>Статус</th>
+                <th>Тема</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var request in Model.ServiceRequests)
+            {
+                <tr>
+                    <td>@request.CreatedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@request.Resident.FullName, кв. @request.Resident.Apartment.Number</td>
+                    <td>@request.Category.ToDisplayName()</td>
+                    <td><span class="status status-priority-@request.Priority.ToString().ToLowerInvariant()">@request.Priority.ToDisplayName()</span></td>
+                    <td><span class="status status-request-@request.Status.ToString().ToLowerInvariant()">@request.Status.ToDisplayName()</span></td>
+                    <td>@request.Title</td>
+                    <td class="text-end">
+                        <a class="btn btn-outline-secondary btn-sm" asp-page="/Requests/Details" asp-route-id="@request.Id">Открыть</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.ServiceRequests.Any())
+            {
+                <tr><td colspan="7" class="text-muted">@Model.EmptyText</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

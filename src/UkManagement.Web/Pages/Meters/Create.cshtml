@@ -1,0 +1,58 @@
+@page
+@model UkManagement.Web.Pages.Meters.CreateModel
+@{
+    ViewData["Title"] = "Добавить прибор";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Приборы учета</p>
+        <h1>Добавить прибор</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Meters/Index">К приборам</a>
+</section>
+
+<section class="panel">
+    <form method="post" class="row g-3">
+        <div asp-validation-summary="All" class="alert alert-danger validation-summary"></div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.ApartmentId" class="form-label">Квартира</label>
+            <select asp-for="Form.ApartmentId" asp-items="Model.ApartmentOptions" class="form-select"></select>
+            <span asp-validation-for="Form.ApartmentId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.Type" class="form-label">Тип прибора</label>
+            <select asp-for="Form.Type" asp-items="Model.TypeOptions" class="form-select"></select>
+            <span asp-validation-for="Form.Type" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.SerialNumber" class="form-label">Серийный номер</label>
+            <input asp-for="Form.SerialNumber" class="form-control" />
+            <span asp-validation-for="Form.SerialNumber" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.ExternalDeviceId" class="form-label">ID устройства MQTT</label>
+            <input asp-for="Form.ExternalDeviceId" class="form-control" />
+            <span asp-validation-for="Form.ExternalDeviceId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Form.InitialValue" class="form-label">Начальное показание</label>
+            <input asp-for="Form.InitialValue" class="form-control" />
+            <span asp-validation-for="Form.InitialValue" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Добавить</button>
+            <a class="btn btn-outline-secondary" asp-page="/Meters/Index">Отмена</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

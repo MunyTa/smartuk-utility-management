@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartUK</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/UkManagement.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand fw-semibold" asp-page="/Index">SmartUK</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Открыть навигацию">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @{
+                            var isAuthenticated = User.Identity?.IsAuthenticated == true;
+                            var isAdmin = User.IsInRole("Admin");
+                            var isDispatcher = User.IsInRole("Dispatcher");
+                            var isResident = User.IsInRole("Resident");
+                        }
+                        @if (isAdmin || isDispatcher)
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Index">Панель</a></li>
+                            @if (isDispatcher && !isAdmin)
+                            {
+                                <li class="nav-item"><a class="nav-link text-dark" asp-page="/Dispatcher/Residents/Index">Жильцы</a></li>
+                                <li class="nav-item"><a class="nav-link text-dark" asp-page="/Notifications/Index">Уведомления</a></li>
+                            }
+                        }
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Admin/Index">Администрирование</a></li>
+                        }
+                        @if (isResident)
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Resident/Index">Мой кабинет</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Resident/Messages">Сообщения</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Resident/Readings">Мои показания</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Resident/Requests">Мои заявки</a></li>
+                        }
+                    </ul>
+                    @if (isAuthenticated)
+                    {
+                        <form method="post" action="/logout" class="d-flex align-items-center gap-2">
+                            <span class="small text-muted">@User.Identity?.Name</span>
+                            <button class="btn btn-outline-secondary btn-sm" type="submit">Выйти</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center gap-2">
+                            <a class="btn btn-outline-secondary btn-sm" href="/login">Войти</a>
+                            <a class="btn btn-primary btn-sm" asp-page="/Register/Index">Регистрация</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - SmartUK
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

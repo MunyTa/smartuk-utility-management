@@ -1,0 +1,112 @@
+@page
+@model UkManagement.Web.Pages.Reports.IndexModel
+@{
+    ViewData["Title"] = "Отчеты";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Аналитика и выгрузка</p>
+        <h1>Отчеты</h1>
+    </div>
+</section>
+
+<section class="panel mb-3">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label asp-for="From" class="form-label">С даты</label>
+            <input asp-for="From" type="date" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="To" class="form-label">По дату</label>
+            <input asp-for="To" type="date" class="form-control" />
+        </div>
+        <div class="col-md-6 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Сформировать</button>
+            <a class="btn btn-outline-secondary" asp-page="/Reports/Index">Сегодня</a>
+            <a class="btn btn-outline-primary"
+               asp-page-handler="Export"
+               asp-route-from="@Model.From?.ToString("yyyy-MM-dd")"
+               asp-route-to="@Model.To?.ToString("yyyy-MM-dd")">CSV</a>
+        </div>
+    </form>
+</section>
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>Показания</span>
+        <strong>@Model.ReadingsCount</strong>
+    </article>
+    <article class="metric-card accent">
+        <span>Аномалии</span>
+        <strong>@Model.AnomalyReadingsCount</strong>
+    </article>
+    <article class="metric-card">
+        <span>Заявки</span>
+        <strong>@Model.RequestsCount</strong>
+    </article>
+    <article class="metric-card">
+        <span>Выполнено заявок</span>
+        <strong>@Model.CompletedRequestsCount</strong>
+    </article>
+    <article class="metric-card">
+        <span>Уведомления</span>
+        <strong>@Model.SentNotificationsCount</strong>
+    </article>
+</section>
+
+<div class="content-grid">
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Показания по типам</h2>
+        </div>
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Тип прибора</th>
+                <th>Количество</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.ReadingsByType)
+            {
+                <tr>
+                    <td>@row.MeterType</td>
+                    <td>@row.Count</td>
+                </tr>
+            }
+            @if (!Model.ReadingsByType.Any())
+            {
+                <tr><td colspan="2" class="text-muted">Нет данных за выбранный период.</td></tr>
+            }
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Заявки по статусам</h2>
+        </div>
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Статус</th>
+                <th>Количество</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.RequestsByStatus)
+            {
+                <tr>
+                    <td>@row.Status</td>
+                    <td>@row.Count</td>
+                </tr>
+            }
+            @if (!Model.RequestsByStatus.Any())
+            {
+                <tr><td colspan="2" class="text-muted">Нет заявок за выбранный период.</td></tr>
+            }
+            </tbody>
+        </table>
+    </section>
+</div>

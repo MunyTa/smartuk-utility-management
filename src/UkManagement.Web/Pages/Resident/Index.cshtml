@@ -1,0 +1,149 @@
+@page
+@model UkManagement.Web.Pages.ResidentArea.IndexModel
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Житель</p>
+        <h1>Личный кабинет</h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary" asp-page="/Resident/Messages">Сообщения</a>
+        <a class="btn btn-primary" asp-page="/Resident/Readings">Передать показания</a>
+        <a class="btn btn-outline-primary" asp-page="/Resident/CreateRequest">Создать заявку</a>
+        <a class="btn btn-outline-secondary" asp-page="/Resident/Profile">Изменить контакты</a>
+    </div>
+</section>
+
+@if (TempData["StatusMessage"] is string statusMessage)
+{
+    <div class="alert alert-success">@statusMessage</div>
+}
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>Квартира</span>
+        <strong>@Model.ResidentProfile.Apartment.Number</strong>
+    </article>
+    <article class="metric-card">
+        <span>Приборы учета</span>
+        <strong>@Model.Meters.Count</strong>
+    </article>
+    <article class="metric-card accent">
+        <span>Активные заявки</span>
+        <strong>@Model.LatestRequests.Count(x => x.Status != ServiceRequestStatus.Completed && x.Status != ServiceRequestStatus.Cancelled)</strong>
+    </article>
+    <article class="metric-card">
+        <span>Новые сообщения</span>
+        <strong>@Model.UnreadMessageCount</strong>
+    </article>
+</section>
+
+<div class="content-grid">
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Мои данные</h2>
+        </div>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">ФИО</dt>
+            <dd class="col-sm-8">@Model.ResidentProfile.FullName</dd>
+
+            <dt class="col-sm-4">Адрес</dt>
+            <dd class="col-sm-8">@Model.ResidentProfile.Apartment.Building.Address, кв. @Model.ResidentProfile.Apartment.Number</dd>
+
+            <dt class="col-sm-4">Этаж</dt>
+            <dd class="col-sm-8">@Model.ResidentProfile.Apartment.Floor</dd>
+
+            <dt class="col-sm-4">Телефон</dt>
+            <dd class="col-sm-8">@Model.ResidentProfile.Phone</dd>
+
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8">@Model.ResidentProfile.Email</dd>
+        </dl>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Мои заявки</h2>
+            <a asp-page="/Resident/Requests">Все заявки</a>
+        </div>
+        <div class="notification-list">
+            @foreach (var request in Model.LatestRequests)
+            {
+                <article>
+                    <div>
+                        <strong>@request.Title</strong>
+                        <span>@request.Category.ToDisplayName(), @request.CreatedAt.ToDisplayTime().ToString("dd.MM HH:mm")</span>
+                    </div>
+                    <span class="status status-request-@request.Status.ToString().ToLowerInvariant()">@request.Status.ToDisplayName()</span>
+                </article>
+            }
+            @if (!Model.LatestRequests.Any())
+            {
+                <p class="text-muted mb-0">Заявок пока нет.</p>
+            }
+        </div>
+    </section>
+</div>
+
+<section class="panel mt-3">
+    <div class="panel-header">
+        <h2>Сообщения от УК</h2>
+        <a asp-page="/Resident/Messages">Все сообщения</a>
+    </div>
+    <div class="notification-list">
+        @foreach (var message in Model.LatestMessages)
+        {
+            <article>
+                <div>
+                    <strong>@message.Subject</strong>
+                    <span>@message.CreatedAt.ToDisplayTime().ToString("dd.MM HH:mm") · @message.Channel.ToDisplayName()</span>
+                </div>
+                @if (message.ReadAt is null)
+                {
+                    <span class="status status-pending">Новое</span>
+                }
+                else
+                {
+                    <span class="status status-sent">Прочитано</span>
+                }
+            </article>
+        }
+        @if (!Model.LatestMessages.Any())
+        {
+            <p class="text-muted mb-0">Сообщений пока нет.</p>
+        }
+    </div>
+</section>
+
+<section class="panel mt-3">
+    <div class="panel-header">
+        <h2>Мои приборы учета</h2>
+        <a asp-page="/Resident/Readings">Журнал и передача показаний</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Серийный номер</th>
+                <th>Тип</th>
+                <th>Последнее значение</th>
+                <th>Статус</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var meter in Model.Meters)
+            {
+                <tr>
+                    <td>@meter.SerialNumber</td>
+                    <td>@meter.Type.ToDisplayName()</td>
+                    <td>@(meter.LastValue is null ? "-" : $"{meter.LastValue} {meter.Unit}")</td>
+                    <td><span class="status status-@meter.Status.ToString().ToLowerInvariant()">@meter.Status.ToDisplayName()</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

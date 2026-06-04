@@ -1,0 +1,57 @@
+@page
+@model UkManagement.Web.Pages.Dispatcher.Residents.IndexModel
+@{
+    ViewData["Title"] = "Жильцы";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Справочник диспетчера</p>
+        <h1>Жильцы</h1>
+    </div>
+</section>
+
+<section class="panel mb-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label asp-for="Sort" class="form-label">Сортировка</label>
+            <select asp-for="Sort" class="form-select">
+                <option value="apartment">По квартире</option>
+                <option value="name">По фамилии</option>
+            </select>
+        </div>
+        <div class="col-md-auto">
+            <button class="btn btn-primary" type="submit">Применить</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Квартира</th>
+                <th>ФИО</th>
+                <th>Телефон</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var resident in Model.Residents)
+            {
+                <tr>
+                    <td>@resident.Apartment.Number</td>
+                    <td>@resident.FullName</td>
+                    <td>@resident.Phone</td>
+                    <td>@resident.Email</td>
+                </tr>
+            }
+            @if (!Model.Residents.Any())
+            {
+                <tr><td colspan="4" class="text-muted">Жильцы пока не добавлены.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

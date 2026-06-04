@@ -1,0 +1,50 @@
+@page
+@model UkManagement.Web.Pages.ResidentArea.RequestsModel
+@{
+    ViewData["Title"] = "Мои заявки";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Житель</p>
+        <h1>Мои заявки</h1>
+    </div>
+    <a class="btn btn-primary" asp-page="/Resident/CreateRequest">Создать заявку</a>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Создана</th>
+                <th>Категория</th>
+                <th>Приоритет</th>
+                <th>Статус</th>
+                <th>Тема</th>
+                <th>Комментарий диспетчера</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var request in Model.ServiceRequests)
+            {
+                <tr>
+                    <td>@request.CreatedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@request.Category.ToDisplayName()</td>
+                    <td><span class="status status-priority-@request.Priority.ToString().ToLowerInvariant()">@request.Priority.ToDisplayName()</span></td>
+                    <td><span class="status status-request-@request.Status.ToString().ToLowerInvariant()">@request.Status.ToDisplayName()</span></td>
+                    <td>
+                        <strong>@request.Title</strong>
+                        <span class="d-block text-muted">@request.Description</span>
+                    </td>
+                    <td>@(request.DispatcherComment ?? "-")</td>
+                </tr>
+            }
+            @if (!Model.ServiceRequests.Any())
+            {
+                <tr><td colspan="6" class="text-muted">Заявок пока нет.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

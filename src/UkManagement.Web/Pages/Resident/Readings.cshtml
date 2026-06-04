@@ -1,0 +1,80 @@
+@page
+@model UkManagement.Web.Pages.ResidentArea.ReadingsModel
+@{
+    ViewData["Title"] = "Мои показания";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Житель</p>
+        <h1>Передача показаний</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Resident/Index">В кабинет</a>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
+
+<section class="panel mb-3">
+    <form method="post" class="row g-3">
+        <div class="col-md-5">
+            <label asp-for="Form.MeterId" class="form-label">Прибор учета</label>
+            <select asp-for="Form.MeterId" asp-items="Model.MeterOptions" class="form-select"></select>
+            <span asp-validation-for="Form.MeterId" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Form.Value" class="form-label">Показание</label>
+            <input asp-for="Form.Value" class="form-control" />
+            <span asp-validation-for="Form.Value" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Form.MeasuredAt" class="form-label">Дата и время</label>
+            <input asp-for="Form.MeasuredAt" class="form-control" />
+            <span asp-validation-for="Form.MeasuredAt" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Отправить показание</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Журнал моих показаний</h2>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Измерено</th>
+                <th>Прибор</th>
+                <th>Значение</th>
+                <th>Качество</th>
+                <th>Получено системой</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var reading in Model.Readings)
+            {
+                <tr>
+                    <td>@reading.MeasuredAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@reading.Meter.Type.ToDisplayName()</td>
+                    <td>@reading.Value @reading.Meter.Unit</td>
+                    <td><span class="status status-@reading.Quality.ToString().ToLowerInvariant()">@reading.Quality.ToDisplayName()</span></td>
+                    <td>@reading.ReceivedAt.ToDisplayTime().ToString("dd.MM.yyyy HH:mm")</td>
+                </tr>
+            }
+            @if (!Model.Readings.Any())
+            {
+                <tr><td colspan="5" class="text-muted">Показаний пока нет.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

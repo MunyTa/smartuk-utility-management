@@ -1,0 +1,39 @@
+@page
+@model UkManagement.Web.Pages.ResidentArea.ProfileModel
+@{
+    ViewData["Title"] = "Контакты";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Личный кабинет</p>
+        <h1>Контакты</h1>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="post" class="row g-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.Email" class="form-label">Email для уведомлений</label>
+            <input asp-for="Form.Email" class="form-control" />
+            <span asp-validation-for="Form.Email" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Form.Phone" class="form-label">Телефон</label>
+            <input asp-for="Form.Phone" class="form-control" />
+            <span asp-validation-for="Form.Phone" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+            <a class="btn btn-outline-secondary" asp-page="/Resident/Index">Отмена</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

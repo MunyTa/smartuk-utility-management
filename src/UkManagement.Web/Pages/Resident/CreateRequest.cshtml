@@ -1,0 +1,49 @@
+@page
+@model UkManagement.Web.Pages.ResidentArea.CreateRequestModel
+@{
+    ViewData["Title"] = "Новая заявка";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Житель</p>
+        <h1>Новая заявка</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Resident/Requests">Мои заявки</a>
+</section>
+
+<section class="panel">
+    <form method="post" class="row g-3">
+        <div class="col-12">
+            <label class="form-label">Житель</label>
+            <input class="form-control" value="@Model.ResidentProfile.FullName, кв. @Model.ResidentProfile.Apartment.Number" disabled />
+        </div>
+
+        <div class="col-md-5">
+            <label asp-for="Form.Category" class="form-label">Категория</label>
+            <select asp-for="Form.Category" asp-items="Model.CategoryOptions" class="form-select"></select>
+            <span asp-validation-for="Form.Category" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-7">
+            <label asp-for="Form.Title" class="form-label">Тема</label>
+            <input asp-for="Form.Title" class="form-control" />
+            <span asp-validation-for="Form.Title" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            <label asp-for="Form.Description" class="form-label">Описание</label>
+            <textarea asp-for="Form.Description" class="form-control" rows="6"></textarea>
+            <span asp-validation-for="Form.Description" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Отправить заявку</button>
+            <a class="btn btn-outline-secondary" asp-page="/Resident/Index">Отмена</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

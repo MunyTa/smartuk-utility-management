@@ -1,0 +1,66 @@
+@page
+@model UkManagement.Web.Pages.Admin.Apartments.IndexModel
+@{
+    ViewData["Title"] = "Квартиры";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Администрирование дома</p>
+        <h1>Квартиры</h1>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>Квартира</th>
+                <th>Этаж</th>
+                <th>Дом</th>
+                <th>Жильцы</th>
+                <th>Приборы</th>
+                <th>Активные заявки</th>
+                <th>Последнее показание</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.Apartments)
+            {
+                <tr>
+                    <td>@row.Apartment.Number</td>
+                    <td>@row.Apartment.Floor</td>
+                    <td>@row.Apartment.Building.Address</td>
+                    <td>
+                        @if (row.Apartment.Residents.Any())
+                        {
+                            @string.Join(", ", row.Apartment.Residents.Select(x => x.FullName))
+                        }
+                        else
+                        {
+                            <span class="text-muted">нет жильцов</span>
+                        }
+                    </td>
+                    <td>@row.Apartment.Meters.Count</td>
+                    <td>@row.ActiveRequestCount</td>
+                    <td>
+                        @if (row.LatestReading is null)
+                        {
+                            <span class="text-muted">нет данных</span>
+                        }
+                        else
+                        {
+                            <span>@row.LatestReading.Value @row.LatestReading.Meter.Unit, @row.LatestReading.ReceivedAt.ToDisplayTime().ToString("dd.MM HH:mm")</span>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Apartments.Any())
+            {
+                <tr><td colspan="7" class="text-muted">Квартиры пока не созданы.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

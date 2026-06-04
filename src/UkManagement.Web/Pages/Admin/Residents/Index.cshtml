@@ -1,0 +1,49 @@
+@page
+@model UkManagement.Web.Pages.Admin.Residents.IndexModel
+@{
+    ViewData["Title"] = "Жильцы";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Администратор</p>
+        <h1>Жильцы и аккаунты</h1>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(Model.CreatedAccountMessage))
+{
+    <div class="alert alert-success">@Model.CreatedAccountMessage</div>
+}
+
+<section class="panel">
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>ФИО</th>
+                <th>Квартира</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th>Логин</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var resident in Model.Residents)
+            {
+                <tr>
+                    <td>@resident.FullName</td>
+                    <td>@resident.Apartment.Building.Address, кв. @resident.Apartment.Number</td>
+                    <td>@resident.Phone</td>
+                    <td>@resident.Email</td>
+                    <td><code>@(resident.KeycloakUsername ?? "-")</code></td>
+                </tr>
+            }
+            @if (!Model.Residents.Any())
+            {
+                <tr><td colspan="5" class="text-muted">Жильцы еще не добавлены.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

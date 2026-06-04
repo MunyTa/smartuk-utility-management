@@ -1,0 +1,54 @@
+@page "{id:int}"
+@model UkManagement.Web.Pages.Meters.ReplaceModel
+@{
+    ViewData["Title"] = "Замена прибора";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Администрирование</p>
+        <h1>Замена прибора учета</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Meters/Index">К приборам</a>
+</section>
+
+<section class="panel">
+    <dl class="row">
+        <dt class="col-sm-3">Адрес</dt>
+        <dd class="col-sm-9">@Model.Meter.Apartment.Building.Address, кв. @Model.Meter.Apartment.Number</dd>
+
+        <dt class="col-sm-3">Тип</dt>
+        <dd class="col-sm-9">@Model.Meter.Type.ToDisplayName()</dd>
+
+        <dt class="col-sm-3">Текущее значение</dt>
+        <dd class="col-sm-9">@(Model.Meter.LastValue is null ? "-" : $"{Model.Meter.LastValue} {Model.Meter.Unit}")</dd>
+    </dl>
+
+    <form method="post" class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="Form.SerialNumber" class="form-label">Новый серийный номер</label>
+            <input asp-for="Form.SerialNumber" class="form-control" />
+            <span asp-validation-for="Form.SerialNumber" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-5">
+            <label asp-for="Form.ExternalDeviceId" class="form-label">ID устройства</label>
+            <input asp-for="Form.ExternalDeviceId" class="form-control" />
+            <span asp-validation-for="Form.ExternalDeviceId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Form.Unit" class="form-label">Единица измерения</label>
+            <input asp-for="Form.Unit" class="form-control" />
+            <span asp-validation-for="Form.Unit" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Сохранить замену</button>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

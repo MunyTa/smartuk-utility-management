@@ -1,0 +1,75 @@
+@page
+@model UkManagement.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Администрирование";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Администратор</p>
+        <h1>Администрирование SmartUK</h1>
+    </div>
+</section>
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>Жильцы</span>
+        <strong>@Model.ResidentCount</strong>
+    </article>
+    <article class="metric-card">
+        <span>Квартиры</span>
+        <strong>@Model.ApartmentCount</strong>
+    </article>
+    <article class="metric-card">
+        <span>Приборы учета</span>
+        <strong>@Model.MeterCount</strong>
+    </article>
+    <article class="metric-card accent">
+        <span>Регистрации</span>
+        <strong>@Model.PendingRegistrationCount</strong>
+    </article>
+    <article class="metric-card accent">
+        <span>Заявки на приборы</span>
+        <strong>@Model.MeterRequestCount</strong>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <h2>Разделы администратора</h2>
+    </div>
+    <div class="admin-action-grid">
+        <a class="admin-action" asp-page="/Admin/Residents/Index">
+            <strong>Жильцы и аккаунты</strong>
+            <span>Просмотр жильцов, квартир и учетных записей входа.</span>
+        </a>
+        <a class="admin-action" asp-page="/Admin/Registrations/Index">
+            <strong>Заявки на регистрацию</strong>
+            <span>Подтверждение новых жильцов после проверки email и номера квартиры.</span>
+        </a>
+        <a class="admin-action" asp-page="/Admin/Apartments/Index">
+            <strong>Квартиры</strong>
+            <span>Структура дома: квартиры, жильцы, приборы, активные заявки и последние показания.</span>
+        </a>
+        <a class="admin-action" asp-page="/Meters/Index">
+            <strong>Приборы учета</strong>
+            <span>Просмотр, фильтрация, добавление и замена приборов учета.</span>
+        </a>
+        <a class="admin-action" asp-page="/Requests/Index">
+            <strong>Заявки на приборы</strong>
+            <span>Технические заявки жильцов на добавление или замену приборов учета.</span>
+        </a>
+        <a class="admin-action" asp-page="/Notifications/Index">
+            <strong>Уведомления</strong>
+            <span>История отправки email, SMS и push-уведомлений жильцам.</span>
+        </a>
+        <a class="admin-action" asp-page="/Reports/Index">
+            <strong>Отчеты</strong>
+            <span>Сводка показаний, заявок и уведомлений за выбранный период с выгрузкой в CSV.</span>
+        </a>
+        <a class="admin-action" asp-page="/Audit/Index">
+            <strong>Журнал действий</strong>
+            <span>История действий администраторов, диспетчеров и жильцов в системе.</span>
+        </a>
+    </div>
+</section>

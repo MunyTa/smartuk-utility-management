@@ -1,0 +1,48 @@
+@page
+@model UkManagement.Web.Pages.Register.StatusModel
+@{
+    ViewData["Title"] = "Статус регистрации";
+}
+
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Регистрация</p>
+        <h1>Статус заявки</h1>
+    </div>
+    <a class="btn btn-outline-secondary" asp-page="/Index">На главную</a>
+</section>
+
+<section class="panel">
+    <dl class="row mb-0">
+        <dt class="col-sm-4">ФИО</dt>
+        <dd class="col-sm-8">@Model.RegistrationRequest.FullName</dd>
+
+        <dt class="col-sm-4">Квартира</dt>
+        <dd class="col-sm-8">@Model.RegistrationRequest.ApartmentNumber</dd>
+
+        <dt class="col-sm-4">Email</dt>
+        <dd class="col-sm-8">@Model.RegistrationRequest.Email</dd>
+
+        <dt class="col-sm-4">Статус</dt>
+        <dd class="col-sm-8">@Model.RegistrationRequest.Status.ToDisplayName()</dd>
+
+        @if (!string.IsNullOrWhiteSpace(Model.RegistrationRequest.ReviewComment))
+        {
+            <dt class="col-sm-4">Комментарий</dt>
+            <dd class="col-sm-8">@Model.RegistrationRequest.ReviewComment</dd>
+        }
+    </dl>
+</section>
+
+@if (Model.RegistrationRequest.Status == RegistrationRequestStatus.PendingApproval)
+{
+    <section class="panel mt-3">
+        <p class="mb-0">Email подтвержден. Теперь администратор управляющей компании проверит заявку и откроет доступ к личному кабинету.</p>
+    </section>
+}
+else if (Model.RegistrationRequest.Status == RegistrationRequestStatus.Approved)
+{
+    <section class="panel mt-3">
+        <p class="mb-0">Аккаунт подтвержден. Теперь можно войти на сайт через email и пароль.</p>
+    </section>
+}
