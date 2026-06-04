@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore .NET projects
+        run: dotnet restore UkManagement.sln
+
+      - name: Test .NET projects
+        run: dotnet test UkManagement.sln --no-restore
+
+      - name: Audit web NuGet packages
+        run: dotnet list src/UkManagement.Web/UkManagement.Web.csproj package --vulnerable --include-transitive
+
+      - name: Audit test NuGet packages
+        run: dotnet list tests/UkManagement.Tests/UkManagement.Tests.csproj package --vulnerable --include-transitive
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python test dependencies
+        run: pip install -r src/iot-simulator/requirements-dev.txt
+
+      - name: Test Python simulator
+        run: PYTHONPATH=src/iot-simulator pytest -p no:cacheprovider src/iot-simulator/tests
+
+      - name: Audit Python packages
+        run: |
+          pip install pip-audit
+          pip-audit -r src/iot-simulator/requirements.txt -r src/iot-simulator/requirements-dev.txt
