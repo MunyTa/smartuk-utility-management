@@ -55,6 +55,31 @@ public sealed class MeterReadingIngestionServiceTests
         Assert.Single(emailSender.Messages);
     }
 
+    [Fact]
+    public async Task IngestAsync_DoesNotNotifyResidentWhenEmergencyNotificationsDisabled()
+    {
+        await using var db = CreateDbContext();
+        await SeedAsync(db, 120m, resident =>
+        {
+            resident.EmergencyNotificationsEnabled = false;
+        });
+        var emailSender = new FakeEmailSender();
+        var service = CreateService(db, emailSender);
+
+        var result = await service.IngestAsync(new MeterReadingPayload
+        {
+            DeviceId = "meter-test-electricity",
+            Unit = "kWh",
+            Value = 220m,
+            MeasuredAt = DateTimeOffset.UtcNow.AddMinutes(1)
+        });
+
+        Assert.True(result.Accepted);
+        Assert.Equal(ReadingQuality.Anomaly, result.Quality);
+        Assert.Empty(await db.Notifications.ToListAsync());
+        Assert.Empty(emailSender.Messages);
+    }
+
     private static AppDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -84,7 +109,10 @@ public sealed class MeterReadingIngestionServiceTests
             NullLogger<MeterReadingIngestionService>.Instance);
     }
 
-    private static async Task SeedAsync(AppDbContext db, decimal? lastValue = null)
+    private static async Task SeedAsync(
+        AppDbContext db,
+        decimal? lastValue = null,
+        Action<Resident>? configureResident = null)
     {
         var building = new Building
         {
@@ -97,12 +125,14 @@ public sealed class MeterReadingIngestionServiceTests
             Floor = 1,
             Building = building
         };
-        apartment.Residents.Add(new Resident
+        var resident = new Resident
         {
             FullName = "Test Resident",
             Email = "resident@example.local",
             Phone = "+79990000000"
-        });
+        };
+        configureResident?.Invoke(resident);
+        apartment.Residents.Add(resident);
         apartment.Meters.Add(new Meter
         {
             SerialNumber = "TEST-EL",

@@ -17,10 +17,12 @@ public sealed class IndexModel(
     public IReadOnlyList<ServiceRequest> LatestRequests { get; private set; } = [];
     public IReadOnlyList<NotificationMessage> LatestMessages { get; private set; } = [];
     public int UnreadMessageCount { get; private set; }
+    public string EmergencyNotificationSummary { get; private set; } = string.Empty;
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         ResidentProfile = await currentResident.GetRequiredAsync(User, cancellationToken);
+        EmergencyNotificationSummary = BuildEmergencyNotificationSummary(ResidentProfile);
 
         Meters = await db.Meters
             .Where(x => x.ApartmentId == ResidentProfile.ApartmentId)
@@ -51,5 +53,31 @@ public sealed class IndexModel(
             .OrderByDescending(x => x.CreatedAt)
             .Take(5)
             .ToListAsync(cancellationToken);
+    }
+
+    private static string BuildEmergencyNotificationSummary(ResidentEntity resident)
+    {
+        if (!resident.EmergencyNotificationsEnabled)
+        {
+            return "отключены";
+        }
+
+        var channels = new List<string>();
+        if (resident.EmergencyEmailEnabled)
+        {
+            channels.Add("Email");
+        }
+
+        if (resident.EmergencySmsEnabled)
+        {
+            channels.Add("SMS");
+        }
+
+        if (resident.EmergencyPushEnabled)
+        {
+            channels.Add("сообщение в профиле и Push");
+        }
+
+        return channels.Count == 0 ? "каналы не выбраны" : string.Join(", ", channels);
     }
 }

@@ -106,8 +106,10 @@ public sealed class MeterReadingIngestionService(
         ReadingQuality quality,
         CancellationToken cancellationToken)
     {
-        var resident = meter.Apartment.Residents.FirstOrDefault();
-        if (resident is null)
+        var residents = meter.Apartment.Residents
+            .Where(x => x.EmergencyNotificationsEnabled)
+            .ToList();
+        if (residents.Count == 0)
         {
             return;
         }
@@ -124,6 +126,30 @@ public sealed class MeterReadingIngestionService(
             Статус: {quality.ToDisplayName()}
             """;
 
-        await notificationService.SendAsync(resident.Id, NotificationChannel.Email, subject, body, cancellationToken);
+        foreach (var resident in residents)
+        {
+            foreach (var channel in GetEmergencyChannels(resident))
+            {
+                await notificationService.SendAsync(resident.Id, channel, subject, body, cancellationToken);
+            }
+        }
+    }
+
+    private static IEnumerable<NotificationChannel> GetEmergencyChannels(Resident resident)
+    {
+        if (resident.EmergencyEmailEnabled)
+        {
+            yield return NotificationChannel.Email;
+        }
+
+        if (resident.EmergencySmsEnabled)
+        {
+            yield return NotificationChannel.Sms;
+        }
+
+        if (resident.EmergencyPushEnabled)
+        {
+            yield return NotificationChannel.Push;
+        }
     }
 }

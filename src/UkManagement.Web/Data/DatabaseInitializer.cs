@@ -12,6 +12,7 @@ public static class DatabaseInitializer
 
         await db.Database.EnsureCreatedAsync();
         await EnsureResidentIdentityColumnsAsync(db);
+        await EnsureResidentNotificationPreferenceColumnsAsync(db);
         await EnsureNotificationReadColumnsAsync(db);
         await EnsurePushSubscriptionsTableAsync(db);
         await EnsureServiceRequestsTableAsync(db);
@@ -138,6 +139,22 @@ public static class DatabaseInitializer
         }
 
         await db.SaveChangesAsync();
+    }
+
+    private static async Task EnsureResidentNotificationPreferenceColumnsAsync(AppDbContext db)
+    {
+        if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            return;
+        }
+
+        await db.Database.ExecuteSqlRawAsync("""
+            ALTER TABLE "Residents"
+                ADD COLUMN IF NOT EXISTS "EmergencyNotificationsEnabled" boolean NOT NULL DEFAULT true,
+                ADD COLUMN IF NOT EXISTS "EmergencyEmailEnabled" boolean NOT NULL DEFAULT true,
+                ADD COLUMN IF NOT EXISTS "EmergencySmsEnabled" boolean NOT NULL DEFAULT false,
+                ADD COLUMN IF NOT EXISTS "EmergencyPushEnabled" boolean NOT NULL DEFAULT false;
+            """);
     }
 
     private static async Task EnsureNotificationReadColumnsAsync(AppDbContext db)

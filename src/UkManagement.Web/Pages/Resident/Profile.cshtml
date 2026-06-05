@@ -27,6 +27,40 @@
             <span asp-validation-for="Form.Phone" class="text-danger"></span>
         </div>
 
+        <div class="col-12">
+            <hr />
+            <h2 class="h5">Аварийные уведомления по приборам</h2>
+            <p class="text-muted mb-2">Эти настройки применяются только к автоматическим предупреждениям о некорректных или резких показаниях приборов учета.</p>
+
+            <div class="form-check form-switch mb-3">
+                <input asp-for="Form.EmergencyNotificationsEnabled" class="form-check-input" />
+                <label asp-for="Form.EmergencyNotificationsEnabled" class="form-check-label">
+                    Получать аварийные уведомления
+                </label>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input asp-for="Form.EmergencyEmailEnabled" class="form-check-input" />
+                        <label asp-for="Form.EmergencyEmailEnabled" class="form-check-label">Email</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input asp-for="Form.EmergencySmsEnabled" class="form-check-input" />
+                        <label asp-for="Form.EmergencySmsEnabled" class="form-check-label">SMS</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input asp-for="Form.EmergencyPushEnabled" class="form-check-input" />
+                        <label asp-for="Form.EmergencyPushEnabled" class="form-check-label">Сообщение в профиле и Push</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-12 d-flex gap-2">
             <button class="btn btn-primary" type="submit">Сохранить</button>
             <a class="btn btn-outline-secondary" asp-page="/Resident/Index">Отмена</a>

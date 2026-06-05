@@ -18,6 +18,11 @@ public sealed class Resident
     [MaxLength(80)]
     public string? KeycloakUsername { get; set; }
 
+    public bool EmergencyNotificationsEnabled { get; set; } = true;
+    public bool EmergencyEmailEnabled { get; set; } = true;
+    public bool EmergencySmsEnabled { get; set; }
+    public bool EmergencyPushEnabled { get; set; }
+
     public int ApartmentId { get; set; }
     public Apartment Apartment { get; set; } = null!;
 
