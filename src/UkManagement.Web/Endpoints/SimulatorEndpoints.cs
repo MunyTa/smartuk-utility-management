@@ -46,6 +46,6 @@ public static class SimulatorEndpoints
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(meters);
-        });
+        }).AllowAnonymous();
     }
 }
