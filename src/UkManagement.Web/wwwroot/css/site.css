@@ -255,6 +255,13 @@ body {
   line-height: 1.6;
 }
 
+.report-subtext {
+  display: block;
+  margin-top: .2rem;
+  color: #687287;
+  font-size: .82rem;
+}
+
 .admin-action-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
