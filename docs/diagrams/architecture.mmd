@@ -1,5 +1,6 @@
 flowchart LR
-    Iot["Python-симулятор LoRaWAN/IoT-приборов"] -->|MQTT-показания| Broker["MQTT-брокер Mosquitto"]
+    Device["Эмулятор умных приборов"] -->|LoRaWAN uplink frame| Gateway["LoRaWAN mock gateway / decoder"]
+    Gateway -->|MQTT-показания| Broker["MQTT-брокер Mosquitto"]
     Broker -->|подписка| Web["ASP.NET Core SmartUK"]
     Web -->|чтение/запись| Db["PostgreSQL"]
     Web -->|OpenID Connect| Keycloak["Keycloak"]

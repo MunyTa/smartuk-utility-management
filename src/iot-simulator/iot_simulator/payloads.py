@@ -12,15 +12,13 @@ class MeterDefinition:
     unit: str
     meter_type: str
     base_value: float
-    min_increment: float
-    max_increment: float
 
 
 DEFAULT_METERS: tuple[MeterDefinition, ...] = (
-    MeterDefinition("meter-101-cold-water", "m3", "ColdWater", 184.0, 0.0, 0.0),
-    MeterDefinition("meter-101-electricity", "kWh", "Electricity", 2840.0, 0.0, 0.0),
-    MeterDefinition("meter-42-hot-water", "m3", "HotWater", 126.0, 0.0, 0.0),
-    MeterDefinition("meter-42-heating", "Gcal", "Heating", 42.0, 0.0, 0.0),
+    MeterDefinition("meter-101-cold-water", "m3", "ColdWater", 184.0),
+    MeterDefinition("meter-101-electricity", "kWh", "Electricity", 2840.0),
+    MeterDefinition("meter-42-hot-water", "m3", "HotWater", 126.0),
+    MeterDefinition("meter-42-heating", "Gcal", "Heating", 42.0),
 )
 
 
@@ -165,14 +163,11 @@ def meter_from_catalog(item: dict[str, object]) -> MeterDefinition | None:
     if base_value is None:
         base_value = _default_base_value(meter_type, unit)
 
-    min_increment, max_increment = _increments_for(meter_type, unit)
     return MeterDefinition(
         device_id=device_id,
         unit=unit,
         meter_type=meter_type,
         base_value=base_value,
-        min_increment=min_increment,
-        max_increment=max_increment,
     )
 
 
@@ -193,7 +188,3 @@ def _default_base_value(meter_type: str, unit: str) -> float:
     if meter_type == "Gas":
         return 50.0
     return 100.0
-
-
-def _increments_for(meter_type: str, unit: str) -> tuple[float, float]:
-    return 0.0, 0.0

@@ -8,7 +8,8 @@ from urllib.request import urlopen
 from paho.mqtt import client as mqtt
 
 from iot_simulator.config import SimulatorConfig
-from iot_simulator.payloads import MeterDefinition, ReadingGenerator, meter_from_catalog
+from iot_simulator.lorawan import LoRaWanMockBridge
+from iot_simulator.payloads import DEFAULT_METERS, MeterDefinition, ReadingGenerator, meter_from_catalog
 
 
 def build_client() -> mqtt.Client:
@@ -17,7 +18,9 @@ def build_client() -> mqtt.Client:
 
 def main() -> None:
     config = SimulatorConfig.from_env()
-    generator = ReadingGenerator([]) if config.meter_catalog_url else ReadingGenerator()
+    initial_meters = [] if config.meter_catalog_url else DEFAULT_METERS
+    generator = ReadingGenerator(initial_meters)
+    lorawan_bridge = LoRaWanMockBridge(initial_meters)
     client = build_client()
     last_catalog_refresh = 0.0
 
@@ -33,13 +36,19 @@ def main() -> None:
                 meters = load_meter_catalog(config.meter_catalog_url)
                 if meters:
                     generator.update_meters(meters)
+                    lorawan_bridge.update_meters(meters)
                     print(f"loaded {len(meters)} meters from catalog")
 
-            for payload in generator.next_payloads():
+            for reading in generator.next_payloads():
+                uplink = lorawan_bridge.to_uplink(reading)
+                payload = lorawan_bridge.decode(uplink)
                 message = json.dumps(payload, ensure_ascii=False)
                 publish = client.publish(config.mqtt_topic, message, qos=1)
                 publish.wait_for_publish()
-                print(f"published {message}")
+                print(
+                    "decoded LoRaWAN uplink "
+                    f"{uplink.dev_eui}/{uplink.frame_counter} and published {message}"
+                )
             time.sleep(config.publish_interval_seconds)
     finally:
         client.loop_stop()
