@@ -11,6 +11,7 @@ class SimulatorConfig:
     mqtt_topic: str
     publish_interval_seconds: float
     meter_catalog_url: str | None
+    simulator_api_key: str | None
     meter_catalog_refresh_seconds: float
 
     @classmethod
@@ -21,5 +22,6 @@ class SimulatorConfig:
             mqtt_topic=os.getenv("MQTT_TOPIC", "uk/meters/readings"),
             publish_interval_seconds=float(os.getenv("PUBLISH_INTERVAL_SECONDS", "5")),
             meter_catalog_url=os.getenv("METER_CATALOG_URL"),
+            simulator_api_key=os.getenv("SIMULATOR_API_KEY"),
             meter_catalog_refresh_seconds=float(os.getenv("METER_CATALOG_REFRESH_SECONDS", "10")),
         )

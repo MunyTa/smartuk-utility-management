@@ -68,6 +68,7 @@ services:
       Vapid__PublicKey: "${VAPID_PUBLIC_KEY:-}"
       Vapid__PrivateKey: "${VAPID_PRIVATE_KEY:-}"
       Vapid__Subject: "${VAPID_SUBJECT:-mailto:dispatcher@uk.local}"
+      SimulatorCatalog__ApiKey: "${SIMULATOR_API_KEY:-smartuk-local-simulator-token}"
       KeycloakAdmin__BaseUrl: http://keycloak:8080
       KeycloakAdmin__Realm: uk-management
       KeycloakAdmin__AdminRealm: master
@@ -95,6 +96,7 @@ services:
       MQTT_TOPIC: uk/meters/readings
       PUBLISH_INTERVAL_SECONDS: "5"
       METER_CATALOG_URL: http://web:8080/api/simulator/meters
+      SIMULATOR_API_KEY: "${SIMULATOR_API_KEY:-smartuk-local-simulator-token}"
       METER_CATALOG_REFRESH_SECONDS: "10"
       PYTHONUNBUFFERED: "1"
     depends_on:

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import time
 from urllib.error import URLError
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from paho.mqtt import client as mqtt
 
@@ -33,7 +33,7 @@ def main() -> None:
             now = time.monotonic()
             if config.meter_catalog_url and now - last_catalog_refresh >= config.meter_catalog_refresh_seconds:
                 last_catalog_refresh = now
-                meters = load_meter_catalog(config.meter_catalog_url)
+                meters = load_meter_catalog(config.meter_catalog_url, config.simulator_api_key)
                 if meters:
                     generator.update_meters(meters)
                     lorawan_bridge.update_meters(meters)
@@ -55,9 +55,14 @@ def main() -> None:
         client.disconnect()
 
 
-def load_meter_catalog(url: str) -> list[MeterDefinition]:
+def load_meter_catalog(url: str, api_key: str | None = None) -> list[MeterDefinition]:
     try:
-        with urlopen(url, timeout=5) as response:
+        headers = {}
+        if api_key:
+            headers["X-Simulator-Api-Key"] = api_key
+
+        request = Request(url, headers=headers)
+        with urlopen(request, timeout=5) as response:
             data = json.loads(response.read().decode("utf-8"))
     except (OSError, URLError, json.JSONDecodeError) as exc:
         print(f"meter catalog unavailable: {exc}")

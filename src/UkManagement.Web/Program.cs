@@ -25,6 +25,7 @@ builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp")
 builder.Services.Configure<SmsOptions>(builder.Configuration.GetSection("Sms"));
 builder.Services.Configure<VapidOptions>(builder.Configuration.GetSection("Vapid"));
 builder.Services.Configure<KeycloakAdminOptions>(builder.Configuration.GetSection("KeycloakAdmin"));
+builder.Services.Configure<SimulatorCatalogOptions>(builder.Configuration.GetSection("SimulatorCatalog"));
 
 builder.Services.AddScoped<MeterReadingIngestionService>();
 builder.Services.AddScoped<NotificationService>();
