@@ -15,7 +15,7 @@ SmartUK - курсовой проект по варианту 16: автомат
 - настройки аварийных уведомлений в личном кабинете жильца;
 - отчеты по потреблению ресурсов с фильтрами по квартире, типу прибора и выгрузкой в Word;
 - модульные тесты для C#-логики приема показаний и Python-генератора сообщений;
-- GitHub Actions для CI, проверки зависимостей и CodeQL/SAST.
+- GitHub Actions для CI, проверки зависимостей, coverage-отчетов и CodeQL/SAST.
 - техническую API-документацию в `docs/api.md`.
 
 ## Запуск
@@ -23,6 +23,13 @@ SmartUK - курсовой проект по варианту 16: автомат
 Перед запуском должен быть открыт Docker Desktop.
 
 ```powershell
+docker compose -p smartuk up --build
+```
+
+Если нужно поднять стенд на полностью чистой базе, сначала выполните:
+
+```powershell
+docker compose -p smartuk down -v
 docker compose -p smartuk up --build
 ```
 
@@ -43,7 +50,13 @@ docker compose -p smartuk up --build
 ## Тестирование
 
 ```powershell
-docker run --rm -v "D:\Курсовая работа:/workspace" -w /workspace mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
+docker run --rm -v "${PWD}:/workspace" -w /workspace mcr.microsoft.com/dotnet/sdk:8.0 dotnet test
+```
+
+Запуск .NET-тестов с отчетом покрытия:
+
+```powershell
+docker run --rm -v "${PWD}:/workspace" -w /workspace mcr.microsoft.com/dotnet/sdk:8.0 dotnet test tests/UkManagement.Tests/UkManagement.Tests.csproj --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory TestResults
 ```
 
 ```powershell
@@ -53,7 +66,22 @@ $env:PYTHONPATH=(Resolve-Path .tmp\pydeps).Path + ';' + (Resolve-Path src\iot-si
 python -m pytest -p no:cacheprovider src\iot-simulator\tests
 ```
 
+Запуск Python-тестов с отчетом покрытия:
+
+```powershell
+$env:PYTHONPATH=(Resolve-Path .tmp\pydeps).Path + ';' + (Resolve-Path src\iot-simulator).Path
+python -m coverage run --source src\iot-simulator\iot_simulator -m pytest -p no:cacheprovider src\iot-simulator\tests
+python -m coverage report -m
+python -m coverage xml -o TestResults\python-coverage.xml
+```
+
 Явное имя проекта Compose `smartuk` важно на этой машине, потому что Docker Compose не может автоматически получить корректное имя проекта из папки с кириллицей.
+
+## Конфигурация и секреты
+
+Реальные ключи и пароли не должны храниться в репозитории. Для локального запуска скопируйте `.env.example` в `.env` и заполните только те каналы, которые нужно проверить: SMTP Mail.ru, SMS Aero, VAPID и внутренний ключ симулятора.
+
+Демо-логины Keycloak и пароль PostgreSQL в `docker-compose.yml` предназначены только для локального учебного стенда. Для промышленного запуска их необходимо заменить на уникальные значения и хранить во внешнем хранилище секретов.
 
 ## Уведомления
 

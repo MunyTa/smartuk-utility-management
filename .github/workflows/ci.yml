@@ -22,8 +22,8 @@ jobs:
       - name: Restore .NET projects
         run: dotnet restore UkManagement.sln
 
-      - name: Test .NET projects
-        run: dotnet test UkManagement.sln --no-restore
+      - name: Test .NET projects with coverage
+        run: dotnet test UkManagement.sln --no-restore --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory TestResults/dotnet
 
       - name: Audit web NuGet packages
         run: dotnet list src/UkManagement.Web/UkManagement.Web.csproj package --vulnerable --include-transitive
@@ -39,10 +39,20 @@ jobs:
       - name: Install Python test dependencies
         run: pip install -r src/iot-simulator/requirements-dev.txt
 
-      - name: Test Python simulator
-        run: PYTHONPATH=src/iot-simulator pytest -p no:cacheprovider src/iot-simulator/tests
+      - name: Test Python simulator with coverage
+        run: |
+          mkdir -p TestResults
+          PYTHONPATH=src/iot-simulator coverage run --source=src/iot-simulator/iot_simulator -m pytest -p no:cacheprovider src/iot-simulator/tests
+          coverage xml -o TestResults/python-coverage.xml
+          coverage report -m
 
       - name: Audit Python packages
         run: |
           pip install pip-audit
           pip-audit -r src/iot-simulator/requirements.txt -r src/iot-simulator/requirements-dev.txt
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: TestResults/**

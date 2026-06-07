@@ -15,5 +15,7 @@ pytest-cache-files-*/
 .tmp/
 .nuget/
 coverage/
+.coverage
 TestResults/
+coursework-private/
 МЕТОДИЧЕСКИЕ УКАЗАНИЯ К КУРСОВОЙ РАБОТЕ _ 2026 .pdf
